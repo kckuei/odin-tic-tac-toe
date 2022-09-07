@@ -145,10 +145,10 @@ username2 = gets.chomp
 puts "\n#{username1} (o) and #{username2} (x) will dual to the fate in a game of #{grid_size}x#{grid_size} tic-tac-toe. Winner take all! ...Champions, prepare yourselves!"
 gets
 cls
-puts "#{username1}\'s move!"
+puts "#{username1}\\'s move!"
 gets
 cls
-puts "#{username2}\'s move!"
+puts "#{username2}\\'s move!"
 
 
 # while 1
