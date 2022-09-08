@@ -25,83 +25,6 @@ module Utilities
   end
 end
 
-grid_3x3 = "
-   |   |   
----+---+---
-   |   |   
----+---+---
-   |   |   
-"
-
-
-grid_5x5 = "
-   |   |   |   |   
----+---+---+---+---
-   |   |   |   |   
----+---+---+---+---
-   |   |   |   |   
----+---+---+---+---
-   |   |   |   |   
----+---+---+---+---
-   |   |   |   |   
-"
-
-grid_3x3 = "
-   │   │
-───┼───┼───
-   │   │
-───┼───┼───
-   │   │
-"
-
-grid_5x5 = "
-   │   │   │   │
-───┼───┼───┼───┼───
-   │   │   │   │
-───┼───┼───┼───┼───
-   │   │   │   │
-───┼───┼───┼───┼───
-   │   │   │   │
-───┼───┼───┼───┼───
-   │   │   │   │
-"
-
-grid_7x7 = "
-   ║   ║   ║   ║   ║   ║   
-═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║   ║   ║  
-═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║   ║   ║  
-═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║   ║   ║  
-═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║   ║   ║  
-═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║   ║   ║  
-═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║   ║   ║  
-"
-
-grid_5x5 = "
-   ║   ║   ║   ║
-═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║
-═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║
-═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║
-═══╬═══╬═══╬═══╬═══
-   ║   ║   ║   ║
-"
-
-grid_3x3 = "
-   ║   ║   
-═══╬═══╬═══
-   ║   ║   
-═══╬═══╬═══
-   ║   ║   
-"
-
 grid = "
 
                                        ║   ║   ║   ║   ║   ║
@@ -152,13 +75,10 @@ def draw_divider
 end
 
 def draw_row(grid_size=3)
-  if grid_size == 3
-    puts "\n═══╬═══╬═══"
-  elsif grid_size == 5
-    puts "\n═══╬═══╬═══╬═══╬═══"
-  elsif grid_size == 7
-    puts "\n═══╬═══╬═══╬═══╬═══╬═══╬═══"
-  end
+  row = "\n"
+  (grid_size-1).times { row << "═══╬" }
+  row << "═══"
+  puts row
 end
 
 def format(val)
@@ -203,6 +123,25 @@ coords = mapping[5]
 board = update_board(coords, 'x', board)
 render_board(board)
 
+puts "\n\n"
+
+# Test 7x7 board
+mapping = make_mapping(7)
+board = initialize_board(7)
+coords = mapping[7]
+board = update_board(coords, 'x', board)
+render_board(board)
+
+puts "\n\n"
+
+# Test 9x9 board
+mapping = make_mapping(9)
+board = initialize_board(9)
+coords = mapping[9]
+board = update_board(coords, 'x', board)
+render_board(board)
+
+
 
 gets
 
@@ -237,18 +176,3 @@ gets
 cls
 puts "#{username2}\'s move!"
 
-
-
-
-
-
-# while 1
-#    puts "Enter a number>>"
-#    begin
-#      num = Kernel.gets.match(/\d+/)[0]
-#    rescue
-#      puts "Erroneous input! Try again..."
-#    else  
-#      puts "#{num} + 1 is: #{num.to_i+1}"
-#    end  
-# end
