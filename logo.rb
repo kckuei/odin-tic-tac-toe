@@ -121,6 +121,92 @@ grid = "
 "
 
 
+
+def make_mapping(grid_size=3, id=0)
+  grid_map = {}
+  for i in 0..grid_size-1 do
+    for j in 0..grid_size-1 do
+      id += 1
+      grid_map[id] = [i,j]
+    end
+  end
+  grid_map
+end
+
+def initialize_board(grid_size=3)
+  board = Array.new()
+  grid_size.times do
+    board <<  Array.new(grid_size, '')
+  end
+  board
+end
+
+
+def update_board(coords, avatar, board)
+  board[coords[0]][coords[1]] = avatar
+  board
+end
+
+def draw_divider
+  print "║"
+end
+
+def draw_row(grid_size=3)
+  if grid_size == 3
+    puts "\n═══╬═══╬═══"
+  elsif grid_size == 5
+    puts "\n═══╬═══╬═══╬═══╬═══"
+  elsif grid_size == 7
+    puts "\n═══╬═══╬═══╬═══╬═══╬═══╬═══"
+  end
+end
+
+def format(val)
+  return val.to_s.rjust(3, ' ')
+end
+
+def render_board(board)
+  grid_size = board.length
+  k = 0;
+  for i in 0..grid_size-1 do
+    for j in 0..grid_size-1 do
+      k += 1
+  	  if board[i][j].empty?
+          print "#{format(k)}"
+  	  else
+          print "#{format(board[i][j])}"
+  	  end
+  	  draw_divider if j < grid_size-1
+    end
+    draw_row(grid_size) if i < grid_size-1
+  end
+end
+
+def valid_move(coords, board)
+  val = board[coords[0]][coords[1]].include?('x')
+  return val.include?('x') || val.include('o')
+end
+
+# Test 3x3 board
+mapping = make_mapping(3)
+board = initialize_board(3)
+coords = mapping[5]
+board = update_board(coords, 'x', board)
+render_board(board)
+
+puts "\n\n"
+
+# Test 5x5 board
+mapping = make_mapping(5)
+board = initialize_board(5)
+coords = mapping[5]
+board = update_board(coords, 'x', board)
+render_board(board)
+
+
+gets
+
+
 include Utilities
 
 cls
@@ -154,16 +240,6 @@ puts "#{username2}\'s move!"
 
 
 
-def make_mapping(grid_size=3, id=0)
-  grid_map = {}
-  for i in 0..grid_size-1 do
-    for j in 0..grid_size-1 do
-      id += 1
-      grid_map[id] = [i,j]
-    end
-  end
-  grid_map
-end
 
 
 # while 1
