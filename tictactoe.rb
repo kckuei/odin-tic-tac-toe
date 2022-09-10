@@ -48,7 +48,19 @@ module IntroScreen
 
 ".freeze
 
-  def do_fancy_intro
+  GAMEOVER = "
+  /$$$$$$                                           /$$$$$$
+ /$$__  $$                                         /$$__  $$
+| $$  \\__/  /$$$$$$  /$$$$$$/$$$$   /$$$$$$       | $$  \\ $$ /$$    /$$ /$$$$$$   /$$$$$$
+| $$ /$$$$ |____  $$| $$_  $$_  $$ /$$__  $$      | $$  | $$|  $$  /$$//$$__  $$ /$$__  $$
+| $$|_  $$  /$$$$$$$| $$ \\ $$ \\ $$| $$$$$$$$      | $$  | $$ \\  $$/$$/| $$$$$$$$| $$  \\__/
+| $$  \\ $$ /$$__  $$| $$ | $$ | $$| $$_____/      | $$  | $$  \\  $$$/ | $$_____/| $$
+|  $$$$$$/|  $$$$$$$| $$ | $$ | $$|  $$$$$$$      |  $$$$$$/   \\  $/  |  $$$$$$$| $$
+ \\______/  \\_______/|__/ |__/ |__/ \\_______/       \\______/     \\_/    \\_______/|__/
+
+  ".freeze
+
+  def fancy_intro
     cls
     puts ODIN
     sleep(1.5)
@@ -57,14 +69,18 @@ module IntroScreen
     puts 'Press any key to start new game.'
     gets
   end
+
+  def fancy_gameover
+    puts GAMEOVER
+  end
 end
 
 # Board module - collection of board creation, rendering, and checking functions
 module Board
   def make_mapping(grid_size = 3, id = 0)
     grid_map = Hash.new(false)
-    for i in 0..grid_size - 1 do
-      for j in 0..grid_size - 1 do
+    (0..grid_size - 1).each do |i|
+      (0..grid_size - 1).each do |j|
         id += 1
         grid_map[id] = [i, j]
       end
@@ -103,8 +119,8 @@ module Board
   def draw_board(board, moves_only = false)
     grid_size = board.length
     k = 0
-    for i in 0..grid_size - 1 do
-      for j in 0..grid_size - 1 do
+    (0..grid_size - 1).each do |i|
+      (0..grid_size - 1).each do |j|
         k += 1
         if board[i][j].empty?
           if moves_only == true
@@ -133,23 +149,26 @@ module Board
     # check rows
     for row in 0..grid_size - 1 do
       result = board[row].reduce('') { |acc, item| acc << item }
-      return true if result.include?(avatar * grid_size)
+      return true if result.count(avatar) == grid_size
     end
     # check columns
     for col in 0..grid_size - 1 do
       result = board.map { |row| row[col] }.join
-      return true if result.include?(avatar * grid_size)
+      return true if result.count(avatar) == grid_size
     end
     # check diaganols
     result = (0..grid_size - 1).to_a.reduce('') { |acc, i| acc << board[i][i] }
-    return true if result.include?(avatar * grid_size)
+    return true if result.count(avatar) == grid_size
 
     result = (0..grid_size - 1).to_a.reduce('') { |acc, i| acc << board[i][grid_size - 1 - i] }
-    return true if result.include?(avatar * grid_size)
+    return true if result.count(avatar) == grid_size
 
     false
   end
+end
 
+# Tests module - testing functionality of the board functions
+module Tests
   def test_drawing(grid_sizes = [3, 5, 7, 9])
     grid_sizes.each do |i|
       mapping = make_mapping(i)
@@ -232,7 +251,7 @@ end
 
 # Game class
 class Game
-  attr_writer :grid_size, :player1, :player2, :board, :mapping
+  attr_writer :grid_size, :player1, :player2, :board, :mapping, :player_now
 
   include Utilities
   include IntroScreen
@@ -244,9 +263,10 @@ class Game
     @player2 = Player.new('player2', 'x')
     @board = nil
     @mapping = nil
+    @player_now = @player1
   end
 
-  def specify_grid_size(grid_size = 0)
+  def define_grid_size(grid_size = 0)
     cls
     puts GRID
     until [3, 5, 7, 9].include?(grid_size.to_i)
@@ -262,54 +282,67 @@ class Game
     @player1.name = gets.chomp
     puts "\nEnter champion 2 name (x):"
     @player2.name = gets.chomp
-    puts "\n#{@player1.name} (o) and #{@player2.name} (x) will dual to the fate" <<
-         "in a game of #{@grid_size}x#{@grid_size} tic-tac-toe. Winner take all!"
-    puts "\n...Champions, prepare yourselves!"
+    puts "\n#{@player1.name} (o) and #{@player2.name} (x) will dual to the fate " <<
+         "in a game of #{@grid_size}x#{@grid_size} tic-tac-toe."
+    puts "\n...prepare for battle!!! >:D"
     gets
   end
 
-  def make_board
+  def define_board
     @mapping = make_mapping(@grid_size.to_i)
     @board = initialize_board(@grid_size.to_i)
   end
 
-  def start_game
-    current_avatar = @player1.avatar
-    current_username = @player1.name
+  def declare_winner
+    winner_avatar = check_winner(@player1.avatar, @board) ? @player1.avatar : @player2.avatar
+    winner = winner_avatar == @player1.avatar ? @player1.name : @player2.name
+    fancy_gameover
+    draw_board(@board, true)
+    puts "#{winner} (#{winner_avatar}) is the tic-tac-toe champion!\n"
+    puts "\nPress any key to start a new game."
+    gets
+  end
+
+  def switch_player
+    @player_now = @player_now.id == @player1.id ? @player2 : @player1
+  end
+
+  def okay_to_move(coords)
+    coords && valid_move(coords, @board)
+  end
+
+  def player_input
+    cls
+    puts "#{@player_now.name}\'s (#{@player_now.avatar}) move! Enter a grid id."
+    input_id = gets.to_i
+    @mapping[input_id]
+  end
+
+  def play_game
     draw_board(@board)
     until check_winner(@player1.avatar, @board) || check_winner(@player2.avatar, @board)
       loop do
-        cls
-        puts "#{current_username}\'s (#{current_avatar}) move! Enter a grid id."
-        input_id = gets.to_i
-        if @mapping[input_id] && valid_move(@mapping[input_id], @board)
-          @board = update_board(@mapping[input_id], current_avatar, @board)
+        coords = player_input
+        if okay_to_move(coords)
+          @board = update_board(coords, @player_now.avatar, @board)
           draw_board(@board)
           draw_board(@board, true)
-          current_avatar = current_avatar == @player1.avatar ? @player2.avatar : @player1.avatar
-          current_username = current_username == @player1.name ? @player2.name : @player1.name
+          switch_player
           break
         end
         puts 'Invalid input'
         draw_board(@board)
       end
     end
-    winner_avatar = check_winner(@player1.avatar, @board) ? @player1.avatar : @player2.avatar
-    winner = winner_avatar == @player1.avatar ? @player1.name : @player2.name
-    puts "\nGAME OVER!\n"
-    draw_board(@board, true)
-    puts "#{winner} (#{winner_avatar}) is the tic-tac-toe champion!\n"
-
-    puts "\nPress any key to start a new game."
-    gets
+    declare_winner
   end
 
   def main
-    do_fancy_intro
-    specify_grid_size
+    fancy_intro
+    define_grid_size
     define_players
-    make_board
-    start_game
+    define_board
+    play_game
     main
   end
 end
