@@ -7,6 +7,58 @@ module Utilities
   end
 end
 
+# IntroScreen module - for fancy intro and board preview
+module IntroScreen
+  ODIN = "
+                 AN
+       _ _                      _         _   _
+ ___ _| |_|___    ___ ___ ___ _| |_ _ ___| |_|_|___ ___ ___
+| . | . | |   |  | . |  _| . | . | | |  _|  _| | . |   |_ -|
+|___|___|_|_|_|  |  _|_| |___|___|___|___|_| |_|___|_|_|___|
+                 |_|                                        \n\n
+                            PRESENTS
+".freeze
+
+  TIC = "
+/$$$$$$$$ /$$             /$$$$$$$$                     /$$$$$$$$
+|__  $$__/|__/            |__  $$__/                    |__  $$__/
+  | $$    /$$  /$$$$$$$     | $$  /$$$$$$   /$$$$$$$      | $$  /$$$$$$   /$$$$$$
+  | $$   | $$ /$$_____/     | $$ |____  $$ /$$_____/      | $$ /$$__  $$ /$$__  $$
+  | $$   | $$| $$           | $$  /$$$$$$$| $$            | $$| $$  \ $$| $$$$$$$$
+  | $$   | $$| $$           | $$ /$$__  $$| $$            | $$| $$  | $$| $$_____/
+  | $$   | $$|  $$$$$$$     | $$|  $$$$$$$|  $$$$$$$      | $$|  $$$$$$/|  $$$$$$$
+  |__/   |__/ \\_______/     |__/ \\_______/ \\_______/      |__/ \______/  \\_______/\n\n
+".freeze
+
+  GRID = "
+
+                                       ║   ║   ║   ║   ║   ║
+                                    ═══╬═══╬═══╬═══╬═══╬═══╬═══
+                                       ║   ║   ║   ║   ║   ║
+                                    ═══╬═══╬═══╬═══╬═══╬═══╬═══
+                 ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
+              ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+                 ║   ║   ║   ║         ║   ║   ║ 7 ║   ║   ║
+              ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+   ║   ║         ║   ║ 5 ║   ║         ║   ║   ║   ║   ║   ║
+═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+   ║ 3 ║         ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
+═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+   ║   ║         ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
+
+".freeze
+
+  def do_fancy_intro
+    cls
+    puts ODIN
+    sleep(1.5)
+    cls
+    puts TIC
+    puts 'Press any key to start new game.'
+    gets
+  end
+end
+
 # Board module - collection of board creation, rendering, and checking functions
 module Board
   def make_mapping(grid_size = 3, id = 0)
@@ -76,7 +128,7 @@ module Board
   end
 
   def check_winner(avatar, board)
-    board = temp_array = Marshal.load(Marshal.dump(board))
+    board = Marshal.load(Marshal.dump(board))
     grid_size = board[0].length
     # check rows
     for row in 0..grid_size - 1 do
@@ -164,133 +216,103 @@ module Board
   end
 end
 
-include Utilities
-include Board
+# Player class
+class Player
+  attr_accessor :name, :avatar, :id, :unique_counter
 
-ODIN = "
-                 AN
-       _ _                      _         _   _
- ___ _| |_|___    ___ ___ ___ _| |_ _ ___| |_|_|___ ___ ___
-| . | . | |   |  | . |  _| . | . | | |  _|  _| | . |   |_ -|
-|___|___|_|_|_|  |  _|_| |___|___|___|___|_| |_|___|_|_|___|
-                 |_|                                        \n\n
-                            PRESENTS
-"
+  @@unique_counter = 0
 
-TIC = "
- /$$$$$$$$ /$$             /$$$$$$$$                     /$$$$$$$$
-|__  $$__/|__/            |__  $$__/                    |__  $$__/
-   | $$    /$$  /$$$$$$$     | $$  /$$$$$$   /$$$$$$$      | $$  /$$$$$$   /$$$$$$
-   | $$   | $$ /$$_____/     | $$ |____  $$ /$$_____/      | $$ /$$__  $$ /$$__  $$
-   | $$   | $$| $$           | $$  /$$$$$$$| $$            | $$| $$  \ $$| $$$$$$$$
-   | $$   | $$| $$           | $$ /$$__  $$| $$            | $$| $$  | $$| $$_____/
-   | $$   | $$|  $$$$$$$     | $$|  $$$$$$$|  $$$$$$$      | $$|  $$$$$$/|  $$$$$$$
-   |__/   |__/ \\_______/     |__/ \\_______/ \\_______/      |__/ \______/  \\_______/\n\n
-"
-
-GRID = "
-
-                                       ║   ║   ║   ║   ║   ║
-                                    ═══╬═══╬═══╬═══╬═══╬═══╬═══
-                                       ║   ║   ║   ║   ║   ║
-                                    ═══╬═══╬═══╬═══╬═══╬═══╬═══
-                 ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
-              ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
-                 ║   ║   ║   ║         ║   ║   ║ 7 ║   ║   ║
-              ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║         ║   ║ 5 ║   ║         ║   ║   ║   ║   ║   ║
-═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║ 3 ║         ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
-═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
-   ║   ║         ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
-
-"
+  def initialize(name = 'unknown', avatar = '')
+    @name = name
+    @avatar = avatar
+    @id = @@unique_counter
+    @@unique_counter += 1
+  end
+end
 
 # Game class
 class Game
+  attr_writer :grid_size, :player1, :player2, :board, :mapping
+
+  include Utilities
+  include IntroScreen
+  include Board
+
   def initialize(grid_size = 3)
     @grid_size = grid_size
-    @players = []
+    @player1 = Player.new('player1', 'o')
+    @player2 = Player.new('player2', 'x')
     @board = nil
-    @over = false
+    @mapping = nil
   end
 
-  def add_player(player)
-    @players << player
-  end
-end
-
-# Player class
-class Player
-  def initialize(name = 'unknown')
-    @name = name
-    @wins = 0
-    @history = {}
-  end
-
-  def new_name(name)
-    self.name = name
-  end
-end
-
-# game = Game.new
-# game.main
-
-def main
-  cls
-  puts ODIN
-  sleep(1.5)
-  cls
-  puts TIC
-  puts 'Press any key to start new game.'
-  gets
-  cls
-  puts GRID
-
-  grid_size = 0
-  until [3, 5, 7, 9].include?(grid_size.to_i)
-    puts "\nSelect your grid size (3, 5, 7, 9)."
-    grid_size = gets.chomp
-  end
-  cls
-  puts "\nEnter champion 1 name (o):"
-  username1 = gets.chomp
-  puts "\nEnter champion 2 name (x):"
-  username2 = gets.chomp
-  puts "\n#{username1} (o) and #{username2} (x) will dual to the fate in a game of #{grid_size}x#{grid_size} tic-tac-toe. Winner take all!"
-  puts "\n...Champions, prepare yourselves!"
-  gets
-
-  current_avatar = 'o'
-  current_username = username1
-  mapping = make_mapping(grid_size.to_i)
-  board = initialize_board(grid_size.to_i)
-  draw_board(board)
-  until check_winner('o', board) || check_winner('x', board)
-    loop do
-      cls
-      puts "#{current_username}\'s (#{current_avatar}) move! Enter a grid id."
-      input_id = gets.to_i
-      if mapping[input_id] && valid_move(mapping[input_id], board)
-        board = update_board(mapping[input_id], current_avatar, board)
-        draw_board(board)
-        draw_board(board, moves_only = true)
-        current_avatar = current_avatar == 'x' ? 'o' : 'x'
-        current_username = current_username == username1 ? username2 : username1
-        break
-      end
-      puts 'Invalid input'
-      draw_board(board)
+  def specify_grid_size(grid_size = 0)
+    cls
+    puts GRID
+    until [3, 5, 7, 9].include?(grid_size.to_i)
+      puts "\nSelect a grid size (3, 5, 7, 9)."
+      grid_size = gets.chomp
     end
+    @grid_size = grid_size
   end
-  winner_avatar = check_winner('o', board) ? 'o' : 'x'
-  winner = winner_avatar == 'o' ? username1 : username2
-  puts "\nGAME OVER!"
-  draw_board(board)
-  draw_board(board, moves_only = true)
-  puts "#{winner} (#{winner_avatar}) is the tic-tac-toe champion!\n"
 
-  puts '\nPress any key to start a new game.'
-  gets
+  def define_players
+    cls
+    puts "\nEnter champion 1 name (o):"
+    @player1.name = gets.chomp
+    puts "\nEnter champion 2 name (x):"
+    @player2.name = gets.chomp
+    puts "\n#{@player1.name} (o) and #{@player2.name} (x) will dual to the fate" <<
+         "in a game of #{@grid_size}x#{@grid_size} tic-tac-toe. Winner take all!"
+    puts "\n...Champions, prepare yourselves!"
+    gets
+  end
+
+  def make_board
+    @mapping = make_mapping(@grid_size.to_i)
+    @board = initialize_board(@grid_size.to_i)
+  end
+
+  def start_game
+    current_avatar = @player1.avatar
+    current_username = @player1.name
+    draw_board(@board)
+    until check_winner(@player1.avatar, @board) || check_winner(@player2.avatar, @board)
+      loop do
+        cls
+        puts "#{current_username}\'s (#{current_avatar}) move! Enter a grid id."
+        input_id = gets.to_i
+        if @mapping[input_id] && valid_move(@mapping[input_id], @board)
+          @board = update_board(@mapping[input_id], current_avatar, @board)
+          draw_board(@board)
+          draw_board(@board, true)
+          current_avatar = current_avatar == @player1.avatar ? @player2.avatar : @player1.avatar
+          current_username = current_username == @player1.name ? @player2.name : @player1.name
+          break
+        end
+        puts 'Invalid input'
+        draw_board(@board)
+      end
+    end
+    winner_avatar = check_winner(@player1.avatar, @board) ? @player1.avatar : @player2.avatar
+    winner = winner_avatar == @player1.avatar ? @player1.name : @player2.name
+    puts "\nGAME OVER!\n"
+    draw_board(@board, true)
+    puts "#{winner} (#{winner_avatar}) is the tic-tac-toe champion!\n"
+
+    puts "\nPress any key to start a new game."
+    gets
+  end
+
+  def main
+    do_fancy_intro
+    specify_grid_size
+    define_players
+    make_board
+    start_game
+    main
+  end
 end
-main
+
+game = Game.new
+game.main
