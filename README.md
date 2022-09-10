@@ -1,5 +1,5 @@
 # odin-tic-tac-toe
-Toy REPL (read print loop) console tic-tac-toe program implemented in `ruby` using OOP.
+Toy REPL (read print loop) console tic-tac-toe program implemented in `ruby` using OOP. [👉Live demo👈](https://replit.com/@KevinKuei/TicTacToe#main.rb). 
 
 
 ## Example Game - 3x3 Grid Winner:
