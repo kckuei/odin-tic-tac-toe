@@ -60,6 +60,18 @@ module IntroScreen
 
   ".freeze
 
+  DRAW = "
+  /$$$$$$$                                   /$$
+  | $$__  $$                                 | $$
+  | $$  \\ $$  /$$$$$$  /$$$$$$  /$$  /$$  /$$| $$
+  | $$  | $$ /$$__  $$|____  $$| $$ | $$ | $$| $$
+  | $$  | $$| $$  \\__/ /$$$$$$$| $$ | $$ | $$|__/
+  | $$  | $$| $$      /$$__  $$| $$ | $$ | $$
+  | $$$$$$$/| $$     |  $$$$$$$|  $$$$$/$$$$/ /$$
+  |_______/ |__/      \\_______/ \\_____/\\___/ |__/
+
+  ".freeze
+
   def fancy_intro
     cls
     puts ODIN
@@ -72,6 +84,10 @@ module IntroScreen
 
   def fancy_gameover
     puts GAMEOVER
+  end
+
+  def fancy_draw
+    puts DRAW
   end
 end
 
@@ -164,6 +180,11 @@ module Board
     return true if result.count(avatar) == grid_size
 
     false
+  end
+
+  def check_tie(board)
+    board = Marshal.load(Marshal.dump(board))
+    board.flatten.count('').zero?
   end
 end
 
@@ -284,7 +305,7 @@ class Game
     @player2.name = gets.chomp
     puts "\n#{@player1.name} (o) and #{@player2.name} (x) will dual to the fate " <<
          "in a game of #{@grid_size}x#{@grid_size} tic-tac-toe."
-    puts "\n...prepare for battle!!! >:D"
+    puts '...prepare for battle!!! >:D'
     gets
   end
 
@@ -293,12 +314,21 @@ class Game
     @board = initialize_board(@grid_size.to_i)
   end
 
+  def declare_tie
+    fancy_draw
+    puts "It's a tie! #{@player1.name} and #{@player2.name} were equally matched!"
+  end
+
   def declare_winner
     winner_avatar = check_winner(@player1.avatar, @board) ? @player1.avatar : @player2.avatar
     winner = winner_avatar == @player1.avatar ? @player1.name : @player2.name
     fancy_gameover
     draw_board(@board, true)
     puts "#{winner} (#{winner_avatar}) is the tic-tac-toe champion!\n"
+  end
+
+  def declare_gameover
+    check_tie(@board) ? declare_tie : declare_winner
     puts "\nPress any key to start a new game."
     gets
   end
@@ -320,7 +350,7 @@ class Game
 
   def play_game
     draw_board(@board)
-    until check_winner(@player1.avatar, @board) || check_winner(@player2.avatar, @board)
+    until check_winner(@player1.avatar, @board) || check_winner(@player2.avatar, @board) || check_tie(@board)
       loop do
         coords = player_input
         if okay_to_move(coords)
@@ -334,7 +364,7 @@ class Game
         draw_board(@board)
       end
     end
-    declare_winner
+    declare_gameover
   end
 
   def main
