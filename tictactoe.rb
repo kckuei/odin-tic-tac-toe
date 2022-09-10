@@ -1,21 +1,223 @@
+# frozen_string_literal: false
+
+# Utilities module - collection of utility functions
+module Utilities
+  def cls
+    system('cls')
+  end
+end
+
+# Board module - collection of board creation, rendering, and checking functions
+module Board
+  def make_mapping(grid_size = 3, id = 0)
+    grid_map = Hash.new(false)
+    for i in 0..grid_size - 1 do
+      for j in 0..grid_size - 1 do
+        id += 1
+        grid_map[id] = [i, j]
+      end
+    end
+    grid_map
+  end
+
+  def initialize_board(grid_size = 3)
+    board = []
+    grid_size.times do
+      board << Array.new(grid_size, '')
+    end
+    board
+  end
+
+  def update_board(coords, avatar, board)
+    board[coords[0]][coords[1]] = avatar
+    board
+  end
+
+  def draw_divider
+    print '║'
+  end
+
+  def draw_row(grid_size = 3)
+    row = "\n"
+    (grid_size - 1).times { row << '═══╬' }
+    row << '═══'
+    puts row
+  end
+
+  def format(val)
+    val.to_s.rjust(3, ' ')
+  end
+
+  def draw_board(board)
+    grid_size = board.length
+    k = 0
+    for i in 0..grid_size - 1 do
+      for j in 0..grid_size - 1 do
+        k += 1
+        if board[i][j].empty?
+          print "#{format(k)}"
+        else
+          print "#{format(board[i][j])}"
+        end
+        draw_divider if j < grid_size - 1
+      end
+      draw_row(grid_size) if i < grid_size - 1
+    end
+    puts "\n\n"
+  end
+
+  def valid_move(coords, board)
+    val = board[coords[0]][coords[1]]
+    !(val.include?('x') || val.include?('o'))
+  end
+
+  def check_winner(avatar, board)
+    board = temp_array = Marshal.load(Marshal.dump(board))
+    grid_size = board[0].length
+    # check rows
+    for row in 0..grid_size - 1 do
+      result = board[row].reduce('') { |acc, item| acc << item }
+      return true if result.include?(avatar * grid_size)
+    end
+    # check columns
+    for col in 0..grid_size - 1 do
+      result = board.map { |row| row[col] }.join
+      return true if result.include?(avatar * grid_size)
+    end
+    # check diaganols
+    result = (0..grid_size - 1).to_a.reduce('') { |acc, i| acc << board[i][i] }
+    return true if result.include?(avatar * grid_size)
+
+    result = (0..grid_size - 1).to_a.reduce('') { |acc, i| acc << board[i][grid_size - 1 - i] }
+    return true if result.include?(avatar * grid_size)
+
+    false
+  end
+
+  def test_drawing(grid_sizes = [3, 5, 7, 9])
+    grid_sizes.each do |i|
+      mapping = make_mapping(i)
+      board = initialize_board(i)
+      coords = mapping[5]
+      board = update_board(coords, 'x', board)
+      draw_board(board)
+    end
+  end
+
+  def test_horizontal
+    mapping = make_mapping(9)
+    board = initialize_board(9)
+    (1..9).to_a.each do |i|
+      coords = mapping[i]
+      update_board(coords, 'x', board)
+    end
+    draw_board(board)
+    puts check_winner('x', board)
+  end
+
+  def test_vertical
+    mapping = make_mapping(9)
+    board = initialize_board(9)
+    (1..73).step(9).to_a.each do |i|
+      coords = mapping[i]
+      update_board(coords, 'x', board)
+    end
+    draw_board(board)
+    puts check_winner('x', board)
+  end
+
+  def test_diag1
+    mapping = make_mapping(9)
+    board = initialize_board(9)
+    (1..81).step(10).to_a.each do |i|
+      coords = mapping[i]
+      update_board(coords, 'x', board)
+    end
+    draw_board(board)
+    puts check_winner('x', board)
+  end
+
+  def test_diag2
+    mapping = make_mapping(9)
+    board = initialize_board(9)
+    (9..73).step(8).to_a.each do |i|
+      coords = mapping[i]
+      update_board(coords, 'x', board)
+    end
+    draw_board(board)
+    puts check_winner('x', board)
+  end
+
+  def test_diag3
+    mapping = make_mapping(5)
+    board = initialize_board(5)
+    [1, 7].each do |i|
+      coords = mapping[i]
+      update_board(coords, 'x', board)
+    end
+    draw_board(board)
+    puts check_winner('x', board)
+  end
+end
+
+include Utilities
+include Board
+
+ODIN = "
+                 AN
+       _ _                      _         _   _
+ ___ _| |_|___    ___ ___ ___ _| |_ _ ___| |_|_|___ ___ ___
+| . | . | |   |  | . |  _| . | . | | |  _|  _| | . |   |_ -|
+|___|___|_|_|_|  |  _|_| |___|___|___|___|_| |_|___|_|_|___|
+                 |_|                                        \n\n
+                            PRESENTS
+"
+
+TIC = "
+ /$$$$$$$$ /$$             /$$$$$$$$                     /$$$$$$$$
+|__  $$__/|__/            |__  $$__/                    |__  $$__/
+   | $$    /$$  /$$$$$$$     | $$  /$$$$$$   /$$$$$$$      | $$  /$$$$$$   /$$$$$$
+   | $$   | $$ /$$_____/     | $$ |____  $$ /$$_____/      | $$ /$$__  $$ /$$__  $$
+   | $$   | $$| $$           | $$  /$$$$$$$| $$            | $$| $$  \ $$| $$$$$$$$
+   | $$   | $$| $$           | $$ /$$__  $$| $$            | $$| $$  | $$| $$_____/
+   | $$   | $$|  $$$$$$$     | $$|  $$$$$$$|  $$$$$$$      | $$|  $$$$$$/|  $$$$$$$
+   |__/   |__/ \\_______/     |__/ \\_______/ \\_______/      |__/ \______/  \\_______/\n\n
+"
+
+GRID = "
+
+                                       ║   ║   ║   ║   ║   ║
+                                    ═══╬═══╬═══╬═══╬═══╬═══╬═══
+                                       ║   ║   ║   ║   ║   ║
+                                    ═══╬═══╬═══╬═══╬═══╬═══╬═══
+                 ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
+              ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+                 ║   ║   ║   ║         ║   ║   ║ 7 ║   ║   ║
+              ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+   ║   ║         ║   ║ 5 ║   ║         ║   ║   ║   ║   ║   ║
+═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+   ║ 3 ║         ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
+═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══   ═══╬═══╬═══╬═══╬═══╬═══╬═══
+   ║   ║         ║   ║   ║   ║         ║   ║   ║   ║   ║   ║
+
+"
+
+# Game class
 class Game
-  def initialize
-    @players
-    @board
+  def initialize(grid_size = 3)
+    @grid_size = grid_size
+    @players = []
+    @board = nil
+    @over = false
   end
 
   def add_player(player)
     @players << player
   end
-
-  def initialize_board; end
-
-  def self.check_winner; end
 end
 
+# Player class
 class Player
-  attr_accessor :name
-
   def initialize(name = 'unknown')
     @name = name
     @wins = 0
@@ -26,3 +228,56 @@ class Player
     self.name = name
   end
 end
+
+# game = Game.new
+# game.main
+
+def main
+  #   cls
+  #   puts ODIN
+  #   sleep(1.5)
+  #   cls
+  #   puts TIC
+  #   puts 'Press any key to start new game.'
+  #   gets
+  #   cls
+  #   puts GRID
+  grid_size = 0
+  until [3, 5, 7, 9].include?(grid_size.to_i)
+    puts "\nSelect your grid size (3, 5, 7, 9)."
+    grid_size = gets.chomp
+  end
+  cls
+  puts 'Enter champion 1 name (o):'
+  username1 = gets.chomp
+  puts "\nEnter champion 2 name (x):"
+  username2 = gets.chomp
+  puts "\n#{username1} (o) and #{username2} (x) will dual to the fate in a game of #{grid_size}x#{grid_size} tic-tac-toe. Winner take all!"
+  puts "\n...Champions, prepare yourselves!"
+  gets
+
+  mapping = make_mapping(grid_size.to_i)
+  board = initialize_board(grid_size.to_i)
+  draw_board(board)
+  until check_winner('x', board) || check_winner('o', board)
+    loop do
+      input_id = gets.to_i
+      if mapping[input_id] && valid_move(mapping[input_id], board)
+        board = update_board(mapping[input_id], 'x', board)
+        draw_board(board)
+        break
+      end
+      puts 'Invalid input'
+      draw_board(board)
+    end
+  end
+  puts 'game over'
+  draw_board(board)
+
+  cls
+  puts "#{username1}\'s move! Enter a grid id."
+  gets
+  cls
+  puts "#{username2}\'s move! Enter a grid id."
+end
+main
