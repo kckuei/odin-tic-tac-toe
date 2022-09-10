@@ -48,14 +48,18 @@ module Board
     val.to_s.rjust(3, ' ')
   end
 
-  def draw_board(board)
+  def draw_board(board, moves_only = false)
     grid_size = board.length
     k = 0
     for i in 0..grid_size - 1 do
       for j in 0..grid_size - 1 do
         k += 1
         if board[i][j].empty?
-          print "#{format(k)}"
+          if moves_only == true
+            print "#{format('')}"
+          else
+            print "#{format(k)}"
+          end
         else
           print "#{format(board[i][j])}"
         end
@@ -233,22 +237,23 @@ end
 # game.main
 
 def main
-  #   cls
-  #   puts ODIN
-  #   sleep(1.5)
-  #   cls
-  #   puts TIC
-  #   puts 'Press any key to start new game.'
-  #   gets
-  #   cls
-  #   puts GRID
+  cls
+  puts ODIN
+  sleep(1.5)
+  cls
+  puts TIC
+  puts 'Press any key to start new game.'
+  gets
+  cls
+  puts GRID
+
   grid_size = 0
   until [3, 5, 7, 9].include?(grid_size.to_i)
     puts "\nSelect your grid size (3, 5, 7, 9)."
     grid_size = gets.chomp
   end
   cls
-  puts 'Enter champion 1 name (o):'
+  puts "\nEnter champion 1 name (o):"
   username1 = gets.chomp
   puts "\nEnter champion 2 name (x):"
   username2 = gets.chomp
@@ -256,28 +261,36 @@ def main
   puts "\n...Champions, prepare yourselves!"
   gets
 
+  current_avatar = 'o'
+  current_username = username1
   mapping = make_mapping(grid_size.to_i)
   board = initialize_board(grid_size.to_i)
   draw_board(board)
-  until check_winner('x', board) || check_winner('o', board)
+  until check_winner('o', board) || check_winner('x', board)
     loop do
+      cls
+      puts "#{current_username}\'s (#{current_avatar}) move! Enter a grid id."
       input_id = gets.to_i
       if mapping[input_id] && valid_move(mapping[input_id], board)
-        board = update_board(mapping[input_id], 'x', board)
+        board = update_board(mapping[input_id], current_avatar, board)
         draw_board(board)
+        draw_board(board, moves_only = true)
+        current_avatar = current_avatar == 'x' ? 'o' : 'x'
+        current_username = current_username == username1 ? username2 : username1
         break
       end
       puts 'Invalid input'
       draw_board(board)
     end
   end
-  puts 'game over'
+  winner_avatar = check_winner('o', board) ? 'o' : 'x'
+  winner = winner_avatar == 'o' ? username1 : username2
+  puts "\nGAME OVER!"
   draw_board(board)
+  draw_board(board, moves_only = true)
+  puts "#{winner} (#{winner_avatar}) is the tic-tac-toe champion!\n"
 
-  cls
-  puts "#{username1}\'s move! Enter a grid id."
+  puts '\nPress any key to start a new game.'
   gets
-  cls
-  puts "#{username2}\'s move! Enter a grid id."
 end
 main
