@@ -1,67 +1,52 @@
+# frozen_string_literal: true
+
+require_relative '../lib/utilities'
+require_relative '../lib/intro_screen'
+require_relative '../lib/board'
+require_relative '../lib/player'
+require_relative '../lib/game'
+
 # Tests module - testing functionality of the board functions
-module Tests
-  def test_drawing(grid_sizes = [3, 5, 7, 9])
-    grid_sizes.each do |i|
-      mapping = make_mapping(i)
-      board = initialize_board(i)
-      coords = mapping[5]
-      board = update_board(coords, 'x', board)
-      draw_board(board)
+
+describe Game do
+  describe '#define_grid_size' do
+    subject(:game) { described_class.new }
+
+    context 'when given a grid size' do
+      before do
+        allow(game).to receive(:puts)
+      end
+
+      it 'sets the grid size to 9' do
+        game.define_grid_size(9)
+        expect(game.instance_variable_get(:@grid_size)).to eq(9)
+      end
+
+      it 'sets the grid size to 5' do
+        game.define_grid_size(5)
+        expect(game.instance_variable_get(:@grid_size)).to eq(5)
+      end
+
+      it 'sets the grid size to 3' do
+        game.define_grid_size(3)
+        expect(game.instance_variable_get(:@grid_size)).to eq(3)
+      end
     end
   end
 
-  def test_horizontal
-    mapping = make_mapping(9)
-    board = initialize_board(9)
-    (1..9).to_a.each do |i|
-      coords = mapping[i]
-      update_board(coords, 'x', board)
+  describe '#check_winner' do
+    context 'when we have a winner' do
+      xit 'returns true' do
+      end
     end
-    draw_board(board)
-    puts check_winner('x', board)
-  end
-
-  def test_vertical
-    mapping = make_mapping(9)
-    board = initialize_board(9)
-    (1..73).step(9).to_a.each do |i|
-      coords = mapping[i]
-      update_board(coords, 'x', board)
+    context 'when we do not have a winner' do
+      xit 'returns false' do
+      end
     end
-    draw_board(board)
-    puts check_winner('x', board)
-  end
-
-  def test_diag1
-    mapping = make_mapping(9)
-    board = initialize_board(9)
-    (1..81).step(10).to_a.each do |i|
-      coords = mapping[i]
-      update_board(coords, 'x', board)
-    end
-    draw_board(board)
-    puts check_winner('x', board)
-  end
-
-  def test_diag2
-    mapping = make_mapping(9)
-    board = initialize_board(9)
-    (9..73).step(8).to_a.each do |i|
-      coords = mapping[i]
-      update_board(coords, 'x', board)
-    end
-    draw_board(board)
-    puts check_winner('x', board)
-  end
-
-  def test_diag3
-    mapping = make_mapping(5)
-    board = initialize_board(5)
-    [1, 7].each do |i|
-      coords = mapping[i]
-      update_board(coords, 'x', board)
-    end
-    draw_board(board)
-    puts check_winner('x', board)
   end
 end
+
+# check board is updated/changes value
+# check correct winner prediction
+# check puts to screens
+# check user input valid, etc.
