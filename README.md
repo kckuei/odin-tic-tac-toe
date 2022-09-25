@@ -1,6 +1,7 @@
 # odin-tic-tac-toe
-Toy REPL (read print loop) console tic-tac-toe program implemented in `ruby` using OOP. [👉Live demo👈](https://replit.com/@KevinKuei/TicTacToe#main.rb). 
+Toy REPL (read print loop) console tic-tac-toe program implemented in `ruby` using OOP. Unit tests implemented with `rspec` for testing key game functionality such as correct game board generation, and declaration of winner. [👉Live demo👈](https://replit.com/@KevinKuei/TicTacToe#main.rb). 
 
+Note that the Live Demo uses the first implementation before units tests were added, and seperation of classes and modules into seperate files. Functionality remains the same.
 
 ## Example Game - 3x3 Grid Winner:
 
