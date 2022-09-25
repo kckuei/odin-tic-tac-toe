@@ -78,22 +78,28 @@ class Game
     @mapping[input_id]
   end
 
+  def update_draw_board(coords)
+    @board = update_board(coords, @player_now.avatar, @board)
+    draw_board(@board)
+    draw_board(@board, true)
+  end
+
+  def game_loop
+    loop do
+      coords = player_input
+      if okay_to_move(coords)
+        update_draw_board(coords)
+        switch_player
+        break
+      end
+      puts 'Invalid input'
+      draw_board(@board)
+    end
+  end
+
   def play_game
     draw_board(@board)
-    until check_winner(@player1.avatar, @board) || check_winner(@player2.avatar, @board) || check_tie(@board)
-      loop do
-        coords = player_input
-        if okay_to_move(coords)
-          @board = update_board(coords, @player_now.avatar, @board)
-          draw_board(@board)
-          draw_board(@board, true)
-          switch_player
-          break
-        end
-        puts 'Invalid input'
-        draw_board(@board)
-      end
-    end
+    game_loop until check_winner(@player1.avatar, @board) || check_winner(@player2.avatar, @board) || check_tie(@board)
     declare_gameover
   end
 
