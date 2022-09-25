@@ -14,6 +14,11 @@ require_relative '../lib/game'
 # check puts to screens
 # check user input valid, etc.
 
+# make sure the tests that determine victory or loss conditions are correctly assessed.
+# write tests to make sure players win when they should
+# Test each of your critical methods to make sure they function properly and handle edge cases.
+# Use mocks/doubles to isolate methods to make sure that they’re sending back the right outputs.
+
 describe Game do
   describe '#define_grid_size' do
     subject(:game) { described_class.new }
@@ -40,11 +45,89 @@ describe Game do
     end
   end
 
+  describe '#initialize_board' do
+    subject(:game) { described_class.new }
+
+    context 'when initialize a board of size 3' do
+      it 'it returns a 3x3 board' do
+        board = game.initialize_board(3)
+        rows = board.length
+        cols = board[0].length
+        elements = board.flatten.length
+        valid_board = rows == cols && elements == 9
+        expect(valid_board).to be true
+      end
+    end
+
+    context 'when initialize a board of size 9' do
+      it 'it returns a 9x9 board' do
+        board = game.initialize_board(9)
+        rows = board.length
+        cols = board[0].length
+        elements = board.flatten.length
+        valid_board = rows == cols && elements == 81
+        expect(valid_board).to be true
+      end
+    end
+  end
+
   describe '#check_winner' do
     subject(:game) { described_class.new }
 
-    context 'when have winner' do
-      it 'returns true for horizontal' do
+    context 'when there is a winner' do
+      it 'returns true for horizontal win condition on grid size 3' do
+        # Arrange
+        board = [
+          %w[x x x],
+          ['', 'o', ''],
+          %w[o o x]
+        ]
+        # Action
+        result = game.check_winner('x', board)
+        # Assert
+        expect(result).to be true
+      end
+
+      it 'returns true for vertical win vertical on grid size 3' do
+        # Arrange
+        board = [
+          ['x', 'o', ''],
+          ['x', 'o', ''],
+          ['',  'o', '']
+        ]
+        # Action
+        result = game.check_winner('o', board)
+        # Assert
+        expect(result).to be true
+      end
+
+      it 'returns true for diaganol win on grid size 3' do
+        # Arrange
+        board = [
+          ['x', '', 'o'],
+          ['', 'o', ''],
+          ['o', 'x', '']
+        ]
+        # Action
+        result = game.check_winner('o', board)
+        # Assert
+        expect(result).to be true
+      end
+
+      it 'returns true for opposing diaganol win on grid size 3' do
+        # Arrange
+        board = [
+          ['x', '', 'o'],
+          ['', 'x', ''],
+          ['o', '', 'x']
+        ]
+        # Action
+        result = game.check_winner('x', board)
+        # Assert
+        expect(result).to be true
+      end
+
+      it 'returns true for horizontal win condition on grid size 9' do
         # Arrange
         grid_size = 9
         board = game.initialize_board(grid_size)
@@ -59,7 +142,7 @@ describe Game do
         expect(result).to be true
       end
 
-      it 'returns true vertical' do
+      it 'returns true for vertical win condition on grid size 9' do
         # Arrange
         grid_size = 9
         board = game.initialize_board(grid_size)
@@ -74,7 +157,7 @@ describe Game do
         expect(result).to be true
       end
 
-      it 'returns true diaganol 1' do
+      it 'returns true for diaganol win condition on grid size 9' do
         # Arrange
         grid_size = 9
         board = game.initialize_board(grid_size)
@@ -89,7 +172,7 @@ describe Game do
         expect(result).to be true
       end
 
-      it 'returns true diaganol 2' do
+      it 'returns true for opposing diaganol win condition on grid size 9' do
         # Arrange
         grid_size = 9
         board = game.initialize_board(grid_size)
@@ -118,7 +201,7 @@ describe Game do
     end
 
     context 'when checking x and o is the winner' do
-      it 'returns false for x' do
+      it 'returns false for x if o is the winner' do
         # Arrange
         grid_size = 9
         board = game.initialize_board(grid_size)
@@ -133,7 +216,7 @@ describe Game do
         expect(result).to be false
       end
 
-      it 'returns true for o' do
+      it 'returns true for o if o is the winner' do
         # Arrange
         grid_size = 9
         board = game.initialize_board(grid_size)
@@ -146,6 +229,40 @@ describe Game do
         result = game.check_winner('o', board)
         # Assert
         expect(result).to be true
+      end
+    end
+  end
+
+  describe '#check_tie' do
+    subject(:game) { described_class.new }
+
+    context 'when the game board is full' do
+      it 'returns true for a tie' do
+        # Arrange
+        board = [
+          %w[x o x],
+          %w[x x o],
+          %w[o x o]
+        ]
+        # Action
+        result = game.check_tie(board)
+        # Assert
+        expect(result).to be true
+      end
+    end
+
+    context 'when the game board is not yet full' do
+      it 'returns false for no tie' do
+        # Arrange
+        board = [
+          ['x', 'o', ''],
+          %w[x x o],
+          %w[o x o]
+        ]
+        # Action
+        result = game.check_tie(board)
+        # Assert
+        expect(result).to be false
       end
     end
   end

@@ -72,12 +72,12 @@ module Board
     board = Marshal.load(Marshal.dump(board))
     grid_size = board[0].length
     # check rows
-    for row in 0..grid_size - 1 do
+    (0..grid_size - 1).each do |row|
       result = board[row].reduce('') { |acc, item| acc << item }
       return true if result.count(avatar) == grid_size
     end
     # check columns
-    for col in 0..grid_size - 1 do
+    (0..grid_size - 1).each do |col|
       result = board.map { |row| row[col] }.join
       return true if result.count(avatar) == grid_size
     end
