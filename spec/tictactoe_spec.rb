@@ -6,18 +6,10 @@ require_relative '../lib/board'
 require_relative '../lib/player'
 require_relative '../lib/game'
 
-# Tests module - testing functionality of the board functions
-
-# Should
-# check board is updated/changes value
-# check correct winner prediction
-# check puts to screens
-# check user input valid, etc.
-
-# make sure the tests that determine victory or loss conditions are correctly assessed.
-# write tests to make sure players win when they should
-# Test each of your critical methods to make sure they function properly and handle edge cases.
-# Use mocks/doubles to isolate methods to make sure that they’re sending back the right outputs.
+# Tests module for testing critical functionality of the game, including, but not limited to:
+ 
+# Correct generation of game board
+# Correct declaration of winner or identification of draw condition
 
 describe Game do
   describe '#define_grid_size' do
